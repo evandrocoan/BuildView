@@ -2,7 +2,9 @@ import sublime
 
 
 class SettingsDeclaration(object):
-    settings_file = "Preferences.sublime-settings"
+    namespace = "org.rctay.buildview"
+    settings_file = "%s.sublime-settings" % namespace
+    prefix = "%s." % namespace
 
     def __init__(self):
         self.dirty = False
@@ -12,9 +14,17 @@ class SettingsDeclaration(object):
         self.dirty = True
         self.value = value
 
-    def get_value(self):
-        return self.value if self.dirty \
-                else sublime.load_settings(self.settings_file).get(self.settings_key, self.default)
+    def get_value(self, view=None):
+        if self.dirty:
+            return self.value
+        value = sublime.load_settings(self.settings_file).get(self.settings_key_stem, self.default)
+        if view:
+            value = view.settings().get(self.settings_key, value)
+        return value
+
+    @property
+    def settings_key(self):
+        return self.prefix + self.settings_key_stem
 
 
 class EnumSettingsDeclaration(SettingsDeclaration):
@@ -24,7 +34,7 @@ class EnumSettingsDeclaration(SettingsDeclaration):
 
 
 class ScrollSetting(EnumSettingsDeclaration):
-    settings_key = "buildview_scroll"
+    settings_key_stem = "scroll"
 
     enum = ["bottom", "top", "last"]
     default = "bottom"
@@ -42,7 +52,7 @@ class BoolSettingsDeclaration(SettingsDeclaration):
 
 
 class EnabledSetting(BoolSettingsDeclaration):
-    settings_key = "buildview_enabled"
+    settings_key_stem = "enabled"
 
     default = True
 
@@ -54,7 +64,7 @@ class SilenceModifiedWarningSetting(BoolSettingsDeclaration):
     The default is to not show a "Save changes?" dialog.
     """
 
-    settings_key = "buildview_silence_modified_warning"
+    settings_key_stem = "silence_modified_warning"
 
     default = True
 
