@@ -1,8 +1,15 @@
 import sublime
 
+# Source: http://stackoverflow.com/a/1383402
+class classproperty(property):
+    def __get__(self, cls, owner):
+        return self.fget.__get__(None, owner)()
+
 
 class SettingsDeclaration(object):
-    settings_file = "Preferences.sublime-settings"
+    namespace = "org.rctay.buildview"
+    settings_file = "%s.sublime-settings" % namespace
+    prefix = "%s." % namespace
 
     def __init__(self):
         self.dirty = False
@@ -12,6 +19,34 @@ class SettingsDeclaration(object):
         self.dirty = True
         self.value = value
 
+    def get_value(self, view=None):
+        if self.dirty:
+            return self.value
+        value = sublime.load_settings(self.settings_file).get(self.settings_key_stem, self.default)
+        if view:
+            value = view.settings().get(self.settings_key, value)
+        return value
+
+    @classproperty
+    @classmethod
+    def settings_key(kls):
+        return kls.prefix + kls.settings_key_stem
+
+
+class EnumSettingsDeclaration(SettingsDeclaration):
+    def set_value(self, value):
+        self.dirty = True
+        self.value = value if value in self.enum else self.default
+
+
+class ScrollSetting(EnumSettingsDeclaration):
+    settings_key_stem = "scroll"
+
+    enum = ["bottom", "top", "last"]
+    default = "bottom"
+
+
+class BoolSettingsDeclaration(SettingsDeclaration):
     def set_opposite(self):
         if self.dirty:
             self.value = not self.value
@@ -21,19 +56,21 @@ class SettingsDeclaration(object):
 
         return self.value
 
-    def get_value(self):
-        return self.value if self.dirty \
-                else sublime.load_settings(self.settings_file).get(self.settings_key, self.default)
+
+class EnabledSetting(BoolSettingsDeclaration):
+    settings_key_stem = "enabled"
+
+    default = True
 
 
-class SilenceModifiedWarningSetting(SettingsDeclaration):
+class SilenceModifiedWarningSetting(BoolSettingsDeclaration):
     """
     This setting determines if a "Save changes?" dialog is to be launched.
 
     The default is to not show a "Save changes?" dialog.
     """
 
-    settings_key = "buildview_silence_modified_warning"
+    settings_key_stem = "silence_modified_warning"
 
     default = True
 
@@ -44,4 +81,5 @@ class _Struct(object):
 
 
 available = _Struct()
+available.Enabled = EnabledSetting()
 available.SilenceModifiedWarning = SilenceModifiedWarningSetting()
