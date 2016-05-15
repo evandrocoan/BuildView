@@ -1,5 +1,10 @@
 import sublime
 
+# Source: http://stackoverflow.com/a/1383402
+class classproperty(property):
+    def __get__(self, cls, owner):
+        return self.fget.__get__(None, owner)()
+
 
 class SettingsDeclaration(object):
     namespace = "org.rctay.buildview"
@@ -22,9 +27,10 @@ class SettingsDeclaration(object):
             value = view.settings().get(self.settings_key, value)
         return value
 
-    @property
-    def settings_key(self):
-        return self.prefix + self.settings_key_stem
+    @classproperty
+    @classmethod
+    def settings_key(kls):
+        return kls.prefix + kls.settings_key_stem
 
 
 class EnumSettingsDeclaration(SettingsDeclaration):
@@ -75,4 +81,5 @@ class _Struct(object):
 
 
 available = _Struct()
+available.Enabled = EnabledSetting()
 available.SilenceModifiedWarning = SilenceModifiedWarningSetting()

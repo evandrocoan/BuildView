@@ -19,7 +19,7 @@ def proxy_settings(pipe, settings):
     set_settings_listener(pipe, "scroll_setting", settings, "bv_scroll")
 
     # enabled
-    set_settings_listener(pipe, "enabled_setting", settings, "bv_enabled")
+    set_settings_listener(pipe, "enabled_setting", settings, settings_bv.EnabledSetting.settings_key)
 
 
 class PlacementPolicy1(object):
@@ -132,7 +132,7 @@ class BuildListener(sublime_plugin.EventListener):
     # to re-implement the copy and cut commands. (Important, since
     # run_command("copy") doesn't do anything.)
     def on_query_context(self, view, key, *args):
-        if key != "build_fake" or not view.settings().get("bv_enabled", True):
+        if key != "build_fake" or not settings_bv.available.Enabled.get_value(view):
             return None
 
         window = view.window()
@@ -174,7 +174,7 @@ class ToggleScrollUnchanged(sublime_plugin.TextCommand):
 class ToggleEnabled(sublime_plugin.TextCommand):
     def run(self, edit):
         s = self.view.settings()
-        s.set("bv_enabled", not s.get("bv_enabled", True))
+        s.set(settings_bv.EnabledSetting.settings_key, not s.get(settings_bv.EnabledSetting.settings_key, True))
 
 
 class ToggleSilenceModifiedWarning(sublime_plugin.TextCommand):
