@@ -42,7 +42,7 @@ class BoolSettingsDeclaration(SettingsDeclaration):
 
 
 class EnabledSetting(BoolSettingsDeclaration):
-    settings_key = None
+    settings_key = "buildview_enabled"
 
     default = True
 
