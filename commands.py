@@ -16,7 +16,7 @@ def set_settings_listener(receiver, r_key, settings, s_key):
 
 def proxy_settings(pipe, settings):
     # scrolling
-    set_settings_listener(pipe, "scroll_setting", settings, "bv_scroll")
+    set_settings_listener(pipe, "scroll_setting", settings, settings_bv.ScrollSetting.settings_key)
 
     # enabled
     set_settings_listener(pipe, "enabled_setting", settings, settings_bv.EnabledSetting.settings_key)
@@ -158,17 +158,17 @@ class BuildListener(sublime_plugin.EventListener):
 
 class ToggleScrollBottom(sublime_plugin.TextCommand):
     def run(self, edit):
-        self.view.settings().set("bv_scroll", "bottom")
+        self.view.settings().set(settings_bv.ScrollSetting.settings_key, "bottom")
 
 
 class ToggleScrollTop(sublime_plugin.TextCommand):
     def run(self, edit):
-        self.view.settings().set("bv_scroll", "top")
+        self.view.settings().set(settings_bv.ScrollSetting.settings_key, "top")
 
 
 class ToggleScrollUnchanged(sublime_plugin.TextCommand):
     def run(self, edit):
-        self.view.settings().set("bv_scroll", "last")
+        self.view.settings().set(settings_bv.ScrollSetting.settings_key, "last")
 
 
 class ToggleEnabled(sublime_plugin.TextCommand):
