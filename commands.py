@@ -11,7 +11,7 @@ def set_settings_listener(receiver, r_key, settings, s_key):
     settings.clear_on_change(s_key)
     def callback(*args):
         val = settings.get(s_key)
-        setattr(receiver, r_key, val)
+        getattr(receiver, r_key).set_value(val)
     settings.add_on_change(s_key, callback)
 
 def proxy_settings(pipe, settings):
@@ -90,7 +90,7 @@ class BuildListener(sublime_plugin.EventListener):
 
     def on_modified(self, view):
         pipe = self.pipes.get(view.id(), None)
-        if pipe is None or not pipe.enabled_setting:
+        if pipe is None or not pipe.enabled_setting.get_value():
             return
 
         pipe.pipe_text(view)
@@ -100,7 +100,7 @@ class BuildListener(sublime_plugin.EventListener):
         if pipe.prepare_create:
             return
 
-        scroll_pos = pipe.scroll_setting
+        scroll_pos = pipe.scroll_setting.get_value()
         if scroll_pos == "top" and pipe.first_update:
             pipe.first_update = False
             pipe.dest_view.show(0)

@@ -12,6 +12,25 @@ class SettingsDeclaration(object):
         self.dirty = True
         self.value = value
 
+    def get_value(self):
+        return self.value if self.dirty \
+                else sublime.load_settings(self.settings_file).get(self.settings_key, self.default)
+
+
+class EnumSettingsDeclaration(SettingsDeclaration):
+    def set_value(self, value):
+        self.dirty = True
+        self.value = value if value in self.enum else self.default
+
+
+class ScrollSetting(EnumSettingsDeclaration):
+    settings_key = "buildview_scroll"
+
+    enum = ["bottom", "top", "last"]
+    default = "bottom"
+
+
+class BoolSettingsDeclaration(SettingsDeclaration):
     def set_opposite(self):
         if self.dirty:
             self.value = not self.value
@@ -21,12 +40,14 @@ class SettingsDeclaration(object):
 
         return self.value
 
-    def get_value(self):
-        return self.value if self.dirty \
-                else sublime.load_settings(self.settings_file).get(self.settings_key, self.default)
+
+class EnabledSetting(BoolSettingsDeclaration):
+    settings_key = None
+
+    default = True
 
 
-class SilenceModifiedWarningSetting(SettingsDeclaration):
+class SilenceModifiedWarningSetting(BoolSettingsDeclaration):
     """
     This setting determines if a "Save changes?" dialog is to be launched.
 
