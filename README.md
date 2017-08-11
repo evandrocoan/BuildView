@@ -25,55 +25,94 @@ accordingly. These bindings **must** have the following context:
 
 	"context": [{"key": "build_fake", "operator":"equal", "operand":true}]
 
+Several aspects of the plugin's behaviour can be changed as detailed below. They
+can be changed on a per-view basis via the Command Palette in either the view
+source code or with build output, or through settings under `"buildview"`.
+
+Note: it seems settings set via Command Palette are persisted through sublime
+exits/launches.
+
+For example, you can add this to your `Preferences.sublime-settings`:
+
+    {
+    	...
+    	"buildview": {
+    		"scroll": "top"
+    	}
+    	...
+    }
+
+For projects, add `"buildview"` under `"settings"` to the project's
+`.sublime-project` file:
+
+    {
+    	...
+    	"folders": [...]
+    	"settings": {
+    		"buildview": {
+    			"scroll": "top"
+    		}
+    	}
+    	...
+    }
+
+This means sublime's [settings hierarchy](http://docs.sublimetext.info/en/latest/customization/settings.html#the-settings-hierarchy)
+is respected. So you could, for example, enable the plugin only for selected
+projects, by setting `"enabled"` to `false` in
+`Packages/User/Preferences.sublime-settings`, and set it to `true` in your
+`.sublime-project`.
+
+
 ## Output scrolling
+
+**Command Palette**:
+
+    Build output always at top
+    Build output always at end
+    Build output stays at same position
+
+**key**: `"scroll"`
+**values**:
+ - `"top"`
+ - `"bottom"`
+ - `"last"`
 
 The plugin can scroll the output to the top, bottom, or the position before
 the current build was launched.
 This can be specified by triggering the Command Palette in *any* view (view
 with build output or with source code) in the window, and selecting one of
 
-    Build output always at top
-    Build output always at end
-    Build output stays at same position
 
 The default is to scroll to the bottom. You can change this by specifying
 `buildview_scroll` in Sublime Text's Settings (ie. user/default
 `Preferences.sublime-settings`). It should be one of these strings:
 
- - `top`
- - `bottom`
- - `last`
-
-For example:
-
-    {
-    	...
-    	"buildview_scroll": "top",
-    	...
-    }
 
 ## "Save changes?" warning
+
+**key**: `silence_modified_warning`
+**values**: `true`/`false`
 
 Since version 90e2365182e9566b2fa79dd7dc79d6b0d7e433f6 (Package Control: 2014.01.27.15.16.48),
 closing the build output view, directly, or indirectly, eg. by exiting
 Sublime Text, no longer causes a "Save changes?" warning to be displayed.
 
 If you wish to have the old behaviour (of having a warning displayed), set
-`buildview_silence_modified_warning` in your user/default `Preferences.sublime-settings`
-to `false` (literal, not a string wrapped in quotes); for example:
 
-    {
-    	...
-    	"buildview_silence_modified_warning": false,
-    	...
-    }
 
 ## Disabling
+
+**Command Palette**:
+
+    Disable/Enable buildview for this window
+
+**key**: `"enabled"`
+**values**: `true`/`false`
+
 
 The plugin can be disabled on a per-view basis by triggering the Command
 Palette in either the view with build output or with source code and selecting
 
-    Disable/Enable buildview for this window
 
 # Known Issues/TODO
 
